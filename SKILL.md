@@ -31,11 +31,10 @@ This follows Kent Beck's [Canon TDD](https://tidyfirst.substack.com/p/canon-tdd)
 
 ## Clarifying Specifications
 
-Before writing tests, follow this loop:
-
-1. Repeat my specifications back to me in your own words
-2. Ask me to confirm your articulation is correct or explain how it's wrong
-3. If confirmed, proceed to writing tests; otherwise use my response and go back to step 1
+Before writing tests, express the specifications in your own words and proceed
+without asking for confirmation by default. Ask when the user requests a
+confirmation or an ambiguity would materially change the result and cannot be
+resolved from the available context.
 
 Specifications should take the form: "under scenario A, X happens; under scenario B, Y happens".
 
@@ -69,12 +68,12 @@ Use your project's test framework and language conventions when writing actual t
 ## Workflow
 
 1. I invoke /tdd with a draft specification
-2. After back-and-forth, we agree on "final" specifications
+2. Formulate the specifications, clarifying only as described above
 3. See if we need to "clean the kitchen before we make dinner". Refer to the "Cleaning the Kitchen" section below.
 4. You write just one test (per Canon TDD)
 5. Show me the test and ask for approval before continuing
-6. Write the application code, show it to me, and ask for approval before committing. Refer to the "Fulfilling Test Specifications" section below.
-7. I provide a new specification and we start over from step 2
+6. Write the application code and review it as described below.
+7. Perform the mutation check below, show me the result, and ask for approval before committing. Repeat from step 2 for any remaining specifications.
 
 ### Cleaning the Kitchen
 
@@ -82,7 +81,36 @@ Before you write a test, picture the test you're going to write and where you're
 
 ### Fulfilling Test Specifications
 
-When writing the application code to fulfill a certain specification, write ONLY ENOUGH CODE to make the current test failure go away. Never use "defensive coding". Defensive coding is almost always just speculative coding — code added without justification or feedback. Once you've written the test, invoke a separate subagent with the /test-design-review command to scrutinize your test code. Then invoke another subagent with the /software-design-review command to scrutinize your application code.
+When writing the application code to fulfill a certain specification, write ONLY ENOUGH CODE to make the current test failure go away. Never use "defensive coding". Defensive coding is almost always just speculative coding — code added without justification or feedback.
+
+Use one review agent to check both the test and application code against the
+principles in [test-design-review](../test-design-review/SKILL.md) and
+[software-design-review](../software-design-review/SKILL.md). In this workflow,
+the single agent reviews all principles itself; do not follow those skills'
+instructions to spawn an agent per principle. The executing agent evaluates and
+addresses the findings.
+
+Use the harness's available delegation and model-selection options to select a
+low-cost capable model for the reviewer, such as a Luna- or Haiku-class model
+when available. Respect explicit user model choices and harness restrictions;
+if model selection or delegation is unavailable, use the available option and
+report the limitation rather than claiming a cheap agent was used.
+
+### Mutation Check
+
+After implementation and a passing test run, delegate mutation testing to a
+different agent, using the same low-cost model selection guidance. Have it make
+small, behavior-changing mutations to the changed code one at a time (for
+example, `<=` to `<`), run the relevant tests for each, and restore each mutation
+before the next. Work in isolation or coordinate edits so existing changes are
+preserved. Confirm the unmutated tests pass again after restoration.
+
+Report killed, surviving, and invalid or equivalent mutations separately. A
+surviving meaningful mutation signals a test gap: strengthen the behavior tests
+and repeat the relevant check. Do not count compilation errors or unrelated test
+failures as a kill, and do not force assertions for equivalent mutations. If
+mutation testing or delegation cannot be performed, report what was not checked
+and why.
 
 ### Don't Be Sloppy
 
